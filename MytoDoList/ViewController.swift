@@ -8,16 +8,27 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+//UITableViewDataSourceとUITableViewDelegateのプロトコルを実装する旨の宣言を行う
+class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
+    @IBOutlet weak var tableView: UITableView!
+    //ToDoを格納した配列
+    var todoList = [String]()
+    
+    //+ボタンが押された時に実行
+    @IBAction func tapAddButton(_ sender: Any) {
+        //アラートダイアログを生成
+        let alertController = UIAlertController(title: "TODO追加", message: "TODOを追加してく浅い", preferredStyle: UIAlertControllerStyle.alert)
+        //テキストエリア追加
+        alertController.addTextField(configurationHandler: nil)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
 
 
