@@ -8,7 +8,7 @@
 
 import UIKit
 
-//UITableViewDataSourceとUITableViewDelegateのプロトコルを実装する旨の宣言を行う
+//UITableViewDataSourceとUITableViewDeleßgateのプロトコルを実装する旨の宣言を行う
 class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
     @IBOutlet weak var tableView: UITableView!
@@ -21,6 +21,27 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         let alertController = UIAlertController(title: "TODO追加", message: "TODOを追加してく浅い", preferredStyle: UIAlertControllerStyle.alert)
         //テキストエリア追加
         alertController.addTextField(configurationHandler: nil)
+        
+        //OKボタンの追加
+        let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.default) { (action:UIAlertAction) in
+            //OKボタンが押された時の処理
+            if let textField = alertController.textFields?.first{
+                //ToDoの配列に入力値を挿入。先頭に挿入する
+                self.todoList.insert(textField.text!, at: 0)
+                
+                //テーブル（配列）に行が追加されたことをテーブルに通知
+                self.tableView.insertRows(at: [IndexPath(row: 0,section: 0)],   with: UITableViewRowAnimation.right)
+            }
+        }
+        
+        alertController.addAction(okAction)
+        
+        //キャンセルボタン追加
+        let cancelButton = UIAlertAction(title: "キャンセル", style: UIAlertActionStyle.cancel, handler: nil)
+        alertController.addAction(cancelButton)
+        
+        //アラートダイアログを表示
+        present(alertController, animated: true, completion: nil)
     }
     
     override func viewDidLoad() {
@@ -30,7 +51,21 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return todoList.count
+    }
 
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        //Storuboardで指定したtodoCell識別子を利用して再利用可能な形でセルを取得する　ー＞　dequeueReusableCellこれ
+        let cell = tableView.dequeueReusableCell(withIdentifier: "todoCell", for: indexPath)
+        //行番号にToDoタイトルを取得
+        let todoTitle = todoList[indexPath.row]
+        //セルのラベルにToDoのタイトルをセット
+        cell.textLabel?.text = todoTitle
+        
+        return cell
+    }
 
 }
 
