@@ -13,7 +13,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
 
     @IBOutlet weak var tableView: UITableView!
     //ToDoを格納した配列
-    var todoList = [String]()
+    var todoList :[String] = []
     
     //+ボタンが押された時に実行
     @IBAction func tapAddButton(_ sender: Any) {
@@ -57,7 +57,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        //Storuboardで指定したtodoCell識別子を利用して再利用可能な形でセルを取得する　ー＞　dequeueReusableCellこれ
+        //Storytaboardで指定したtodoCell識別子を利用して再利用可能な形でセルを取得する　ー＞　dequeueReusableCellこれ
         let cell = tableView.dequeueReusableCell(withIdentifier: "todoCell", for: indexPath)
         //行番号にToDoタイトルを取得
         let todoTitle = todoList[indexPath.row]
