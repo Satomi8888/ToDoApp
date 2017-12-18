@@ -13,7 +13,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
 
     @IBOutlet weak var tableView: UITableView!
     //ToDoを格納した配列
-    var todoList :[String] = ["kohe", "toyama", "ami"]
+    var todoList = [MyTodo]()
     
     //+ボタンが押された時に実行
     @IBAction func tapAddButton(_ sender: Any) {
@@ -27,14 +27,18 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             //OKボタンが押された時の処理
             if let textField = alertController.textFields?.first{
                 //ToDoの配列に入力値を挿入。先頭に挿入する
-                self.todoList.insert(textField.text!, at: 0)
+                let myTodo = MyTodo()
+                myTodo.todoTitle = textField.text!
+                self.todoList.insert(myTodo, at: 0)
                 
                 //テーブル（配列）に行が追加されたことをテーブルに通知
                 self.tableView.insertRows(at: [IndexPath(row: 0,section: 0)],   with: UITableViewRowAnimation.right)
                 
                 //ToDoの保存処理
                 let userDefault = UserDefaults.standard
-                userDefault.set(self.todoList, forKey:"todoList")
+                //Data型にシリアライズする
+                let data = NSKeyedArchiver.archivedData(withRootObject: self.todoList)
+                userDefault.set(data, forKey:"todoList")
                 userDefault.synchronize()
             }
         }
@@ -54,8 +58,10 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         
         //保存しているToDoの読み込み処理
         let userDefault = UserDefaults.standard
-        if let strdTodoList = userDefault.array(forKey: "todoList") as? [String]{
-            todoList.append(contentsOf: strdTodoList)
+        if let strdTodoList = userDefault.object(forKey: "todoList") as? Data {
+            if let unarchiveTodoList = NSKeyedUnarchiver.unarchiveObject(with: strdTodoList) as? [MyTodo] {
+                todoList.append(contentsOf: unarchiveTodoList)
+            }
         }
         
         
@@ -72,14 +78,27 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         //Storytaboardで指定したtodoCell識別子を利用して再利用可能な形でセルを取得する　ー＞　dequeueReusableCellこれ
         let cell = tableView.dequeueReusableCell(withIdentifier: "todoCell", for: indexPath)
-        //行番号にToDoタイトルを取得
-        let todoTitle = todoList[indexPath.row]
+        //行番号に合ったToDoの情報を取得
+        let myTodo = todoList[indexPath.row]
         //セルのラベルにToDoのタイトルをセット
-        cell.textLabel?.text = todoTitle
+        cell.textLabel?.text = myTodo.todoTitle
+        //セルのチェックマークの状態をセット
+        if myTodo.todoDone {
+            //チェックありの場合
+            cell.accessoryType = UITableViewCellAccessoryType.checkmark
+        } else {
+            //チェックがない場合
+            cell.accessoryType = UITableViewCellAccessoryType.none
+        }
         
         return cell
     }
 
+    //セルをタップしたときの処理
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+    }
+    
 }
 
 //独自クラスをシリアライズする際には、NSObjectを継承し、NSCodingプロトコルに準拠する必要がある
