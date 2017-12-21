@@ -18,7 +18,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     //+ボタンが押された時に実行
     @IBAction func tapAddButton(_ sender: Any) {
         //アラートダイアログを生成
-        let alertController = UIAlertController(title: "TODO追加", message: "TODOを追加してく浅い", preferredStyle: UIAlertControllerStyle.alert)
+        let alertController = UIAlertController(title: "TODO追加", message: "TODOを追加してください", preferredStyle: UIAlertControllerStyle.alert)
         //テキストエリア追加
         alertController.addTextField(configurationHandler: nil)
         
@@ -96,9 +96,28 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
 
     //セルをタップしたときの処理
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        //行番号に合ったToDoの情報を取得
+        let myTodo = todoList[indexPath.row]
+        //チェックのありなしを変える
+        if myTodo.todoDone {
+            //チェックありの場合
+            myTodo.todoDone = false
+        } else {
+            //チェックがない場合
+            myTodo.todoDone = true
+        }
         
+        //セルの状態を変更
+        tableView.reloadRows(at: [indexPath], with: UITableViewRowAnimation.fade)
+        
+        //データに保存してData型にシリアライズする　※インスタンスはクローン渡しだから、
+        let data:Data = NSKeyedArchiver.archivedData(withRootObject: todoList)
+        
+        //userDefaultsに保存
+        let userDefaults = UserDefaults.standard
+        userDefaults.set(data, forKey: "todoList")
+        userDefaults.synchronize()
     }
-    
 }
 
 //独自クラスをシリアライズする際には、NSObjectを継承し、NSCodingプロトコルに準拠する必要がある
