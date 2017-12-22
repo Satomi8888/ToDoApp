@@ -118,6 +118,30 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         userDefaults.set(data, forKey: "todoList")
         userDefaults.synchronize()
     }
+    
+    //セルが編集可能かどうかを返却する
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    //セルを削除した時の処理
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == UITableViewCellEditingStyle.delete{
+            //TODOから削除
+            todoList.remove(at: indexPath.row)
+            
+            //セル削除
+            tableView.deleteRows(at: [indexPath], with: UITableViewRowAnimation.fade)
+            
+            //データに保存。Data型にシリアライズする
+            let data:Data = NSKeyedArchiver.archivedData(withRootObject: todoList)
+            
+            //Usedefaultsに保存
+            let userDefault = UserDefaults.standard
+            userDefault.set(data, forKey: "todoList")
+            userDefault.synchronize()
+        }
+    }
 }
 
 //独自クラスをシリアライズする際には、NSObjectを継承し、NSCodingプロトコルに準拠する必要がある
